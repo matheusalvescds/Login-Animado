@@ -1,0 +1,317 @@
+/* ============================================================
+   Tela de login minimalista
+   Combina 3 abordagens de animação:
+     ETAPA 1 — W3Schools (@keyframes simples)
+     ETAPA 2 — Prismic (transitions/hover refinados)
+     ETAPA 3 — Animate.css (biblioteca via CDN, usada no HTML/JS)
+   ============================================================ */
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --bg: #0e0e10;
+    --surface: #16161a;
+    --surface-2: #1d1d22;
+    --border: #2a2a30;
+    --text: #f1f1f3;
+    --text-muted: #8b8b94;
+    --accent: #7c5cff;
+    --accent-soft: rgba(124, 92, 255, 0.15);
+    --error: #ff5c7c;
+    --success: #5cffb1;
+    --radius: 14px;
+    --transition: 0.25s ease;
+}
+
+html, body {
+    height: 100%;
+}
+
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    overflow: hidden;
+    font-size: 15px;
+    line-height: 1.5;
+    /* Permite transformações 3D nos filhos (tilt do card) */
+    perspective: 1200px;
+}
+
+/* Canvas de partículas — ocupa toda a tela atrás do conteúdo */
+#particles {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* ============================================================
+   ETAPA 1 — animações básicas (estilo W3Schools)
+   @keyframes simples: glow ambiente + ponto pulsante
+   Referência: https://www.w3schools.com/css/css3_animations.asp
+   ============================================================ */
+
+.ambient-glow {
+    position: fixed;
+    /* As variáveis --mx e --my são atualizadas pelo JS conforme o mouse se move */
+    top: var(--my, 50%);
+    left: var(--mx, 50%);
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(
+        circle at center,
+        var(--accent-soft) 0%,
+        transparent 60%
+    );
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    pointer-events: none;
+    transition: top 0.4s ease-out, left 0.4s ease-out;
+    animation: pulse-glow 5s ease-in-out infinite;
+}
+
+/* ETAPA 1: pulso sutil do glow (W3Schools) */
+@keyframes pulse-glow {
+    0%, 100% { opacity: 0.85; }
+    50%      { opacity: 1; }
+}
+
+.brand-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    margin: 0 auto 20px;
+    animation: blink 2.4s ease-in-out infinite;
+    box-shadow: 0 0 12px var(--accent);
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1;   transform: scale(1); }
+    50%      { opacity: 0.4; transform: scale(0.9); }
+}
+
+/* ============================================================
+   ETAPA 2 — animações intermediárias (estilo Prismic)
+   Referência: https://prismic.io/blog/css-animation-examples
+   Combinam transitions, gradientes e pseudo-elementos.
+   ============================================================ */
+
+/* Linha animada abaixo do input — "underline reveal" */
+.underline {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 1.5px;
+    width: 100%;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.input-box input:focus ~ .underline {
+    transform: scaleX(1);
+}
+
+/* Botão com efeito de hover refinado (preenchimento deslizante) */
+.btn {
+    position: relative;
+    width: 100%;
+    padding: 13px 20px;
+    font: 500 15px 'Inter', sans-serif;
+    color: var(--text);
+    background: var(--accent);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    overflow: hidden;
+    margin-top: 8px;
+    transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.btn span {
+    position: relative;
+    z-index: 2;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #9c7fff, #7c5cff);
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    z-index: 1;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px -8px var(--accent);
+}
+
+.btn:hover::before { opacity: 1; }
+
+.btn:active { transform: translateY(0); }
+
+/* ============================================================
+   LAYOUT GERAL
+   ============================================================ */
+
+.card {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 380px;
+    padding: 40px 36px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow:
+        0 20px 60px -20px rgba(0, 0, 0, 0.6),
+        0 0 0 1px rgba(255, 255, 255, 0.02) inset;
+    /* Tilt 3D: as variáveis --rx e --ry são atualizadas pelo JS */
+    transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+    transform-style: preserve-3d;
+    transition: transform 0.15s ease-out;
+    will-change: transform;
+}
+
+.card-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+.subtitle {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-top: 6px;
+}
+
+/* Campos */
+.form { display: flex; flex-direction: column; gap: 18px; }
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+
+.field label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.input-box {
+    position: relative;
+    border-bottom: 1px solid var(--border);
+}
+
+.input-box input {
+    width: 100%;
+    padding: 10px 2px;
+    font: 400 15px 'Inter', sans-serif;
+    color: var(--text);
+    background: transparent;
+    border: none;
+    outline: none;
+}
+
+.input-box input::placeholder {
+    color: #4a4a52;
+}
+
+/* Linha (lembrar / esqueci) */
+.row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+    margin: 4px 0 6px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    color: var(--text-muted);
+    user-select: none;
+}
+
+.check input { display: none; }
+
+.box {
+    width: 16px;
+    height: 16px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    transition: all var(--transition);
+    position: relative;
+}
+
+.check input:checked + .box {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+
+.check input:checked + .box::after {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 1px;
+    width: 4px;
+    height: 8px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.link {
+    color: var(--accent);
+    text-decoration: none;
+    transition: opacity var(--transition);
+}
+
+.link:hover { opacity: 0.75; }
+
+/* Mensagem de feedback */
+.message {
+    min-height: 20px;
+    font-size: 0.85rem;
+    text-align: center;
+    margin-top: 4px;
+}
+
+.message.success { color: var(--success); }
+.message.error   { color: var(--error); }
+
+/* Rodapé do card */
+.footer-text {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-top: 28px;
+}
+
+/* Responsivo */
+@media (max-width: 420px) {
+    .card { padding: 32px 24px; }
+    .title { font-size: 1.35rem; }
+}
